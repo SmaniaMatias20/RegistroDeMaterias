@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-from client.GUI_config import approved_quantity
-from model.Data import edit, eliminate, show
+from client.GUI_config import get_statistics
+from model.Data import *
 from model.Data import Materia, save
+
 
 class Frame(tk.Frame):
     def __init__(self, screen = None):
@@ -14,16 +15,39 @@ class Frame(tk.Frame):
         self.name_var = tk.StringVar()
         self.state_var = tk.StringVar()
         self.qualification_var = tk.StringVar()
-
+        self.count = [0,0,0,0]
+        self.list_materias = []
         self.update()
         self.disable_fields()
-
-
+        self.menu_bar(screen)
         # self.config(bg = 'black')
 
     def update(self):
+
         self.update_table()
         self.fields()
+
+    def menu_bar(self, screen):
+        bar = tk.Menu(screen)
+        screen.config(menu = bar, width = 300, height = 300)
+        
+        menu_init = tk.Menu(bar, tearoff = 0)
+        menu_mate = tk.Menu(bar, tearoff = 0)
+
+
+
+        bar.add_cascade(label = 'Inicio', menu = menu_init)
+        menu_init.add_command(label = 'Crear una tabla en DB', command = create_table)
+        menu_init.add_command(label = 'Eliminar una tabla en DB', command = eliminate_table)
+        menu_init.add_command(label = 'Salir', command = screen.destroy)
+
+        bar.add_cascade(label = 'Materias', menu = menu_mate)
+        menu_mate.add_command(label = 'Todas', command = self.get_all)
+        menu_mate.add_command(label = 'Aprobadas', command = self.get_approved)
+        menu_mate.add_command(label = 'Final', command = self.get_final)
+        menu_mate.add_command(label = 'Desaprobadas', command = self.get_disapproved)
+        menu_mate.add_command(label = 'Sin cursar', command = self.get_unrealized)
+
 
     def fields(self):
 
@@ -48,20 +72,16 @@ class Frame(tk.Frame):
         self.label_state.config(font = ('Arial Black', 12), padx = 10, pady = 10)
         self.label_state.grid(row = 4, column = 0, columnspan = 2)
 
-        self.label_quantity = tk.Label(self, text = "Aprobadas")
-        self.label_quantity.config(font = ('Arial Black', 20), padx = 10, pady = 10)
-        self.label_quantity.grid(row = 1, column = 2)
+        self.label_quantity = tk.Label(self, text = f"Aprobadas\n {self.count[0]}/{self.count[1]}")
+        self.label_quantity.config(font = ('Arial Black', 12), padx = 10, pady = 10)
+        self.label_quantity.grid(row = 0, column = 2)
 
-        self.label_quantity = tk.Label(self, text = f"{self.count[0]}/{self.count[1]}")
-        self.label_quantity.config(font = ('Arial Black', 20), padx = 10, pady = 10)
+        self.label_quantity = tk.Label(self, text = f"Porcentaje\n {self.count[2]}% ")
+        self.label_quantity.config(font = ('Arial Black', 12), padx = 10, pady = 10)
         self.label_quantity.grid(row = 2, column = 2)
 
-        self.label_quantity = tk.Label(self, text = "Porcentaje")
-        self.label_quantity.config(font = ('Arial Black', 20), padx = 10, pady = 10)
-        self.label_quantity.grid(row = 3, column = 2)
-
-        self.label_quantity = tk.Label(self, text = f" {self.count[2]}% ")
-        self.label_quantity.config(font = ('Arial Black', 20), padx = 10, pady = 10)
+        self.label_quantity = tk.Label(self, text = f"Promedio\n {self.count[3]:0}")
+        self.label_quantity.config(font = ('Arial Black', 12), padx = 10, pady = 10)
         self.label_quantity.grid(row = 4, column = 2)
     
     def create_entrys(self):
@@ -107,6 +127,11 @@ class Frame(tk.Frame):
         self.scroll.grid(row = 7, column = 4, sticky = 'nse')
         self.table.configure(yscrollcommand = self.scroll.set)
 
+        self.table.heading('#0', text = 'ID')
+        self.table.heading('#1', text = 'NOMBRE')
+        self.table.heading('#2', text = 'NOTA FINAL')
+        self.table.heading('#3', text = 'ESTADO')
+
 
     def enable_fields(self):
         self.state_var.set('')
@@ -149,16 +174,12 @@ class Frame(tk.Frame):
     
     def update_table(self):
         self.list_materias = show()
+
         self.list_materias.reverse()
-        self.count = approved_quantity(self.list_materias)
+        self.count = get_statistics(self.list_materias)
 
         self.create_table()
 
-        self.table.heading('#0', text = 'ID')
-        self.table.heading('#1', text = 'NOMBRE')
-        self.table.heading('#2', text = 'NOTA FINAL')
-        self.table.heading('#3', text = 'ESTADO')
-        
         for m in self.list_materias:
             self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
 
@@ -187,12 +208,70 @@ class Frame(tk.Frame):
 
             # Update table
             self.update()
+
             self.id = None
         except:
             tittle = 'Eliminacion de Registro'
             message = 'No ha seleccionado ningun registro'
             messagebox.showwarning(title = tittle, message = message)
-            
 
 
+    def get_all(self):
+        self.list_materias = show()
+
+        self.list_materias.reverse()
+        self.count = get_statistics(self.list_materias)
+
+        self.create_table()
+
+        for m in self.list_materias:
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+
+
+    def get_approved(self):
+        self.list_materias = show_approved()
+
+        self.list_materias.reverse()
+        self.count = get_statistics(self.list_materias)
+
+        self.create_table()
+
+        for m in self.list_materias:
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+
+    def get_disapproved(self):
+        self.list_materias = show_disapproved()
+
+        self.list_materias.reverse()
+        self.count = get_statistics(self.list_materias)
+
+        self.create_table()
+
+        for m in self.list_materias:
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+    
+    def get_unrealized(self):
+        self.list_materias = show_unrealized()
+
+        self.list_materias.reverse()
+        self.count = get_statistics(self.list_materias)
+
+        self.create_table()
+
+        for m in self.list_materias:
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+    
+    def get_final(self):
+        self.list_materias = show_final()
+
+        self.list_materias.reverse()
+        self.count = get_statistics(self.list_materias)
+
+        self.create_table()
+
+        for m in self.list_materias:
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+
+
+        
 

@@ -1,6 +1,7 @@
 from model.Materia import Materia
 from .ConectionDB import ConectionDB
 from tkinter import messagebox
+import sqlite3
 
 def create_table():
     conection = ConectionDB()
@@ -9,7 +10,7 @@ def create_table():
     CREATE TABLE materias (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(100) NULL,
-    qualification VARCHAR(10) NULL,
+    qualification INTEGER NULL,
     state VARCHAR(100) NULL
     )
     '''
@@ -48,12 +49,16 @@ def save(materia: Materia):
     conection = ConectionDB()
 
     sentence = f"""
-    INSERT INTO materias (name, qualification, state) VALUES ('{materia.name}', '{materia.qualification}', '{materia.state}')
+    INSERT INTO materias (name, qualification, state) VALUES ('{materia.name}', {materia.qualification}, '{materia.state}')
     """
     try: 
         conection.cursor.execute(sentence)
         conection.close()
-    except:
+    except sqlite3.OperationalError:
+        tittle = 'Guardar datos'
+        message = 'Debe ingresar un numero en Nota Final'
+        messagebox.showwarning(title = tittle, message = message)
+    except Exception:
         tittle = 'Conexion al Registro'
         message = 'No hay tabla para insertar los datos'
         messagebox.showerror(title = tittle, message = message)
@@ -83,7 +88,7 @@ def edit(materia: Materia, id):
 
     sentence = f"""
     UPDATE materias
-    SET name = '{materia.name}', qualification = '{materia.qualification}', state = '{materia.state}' 
+    SET name = '{materia.name}', qualification = {materia.qualification}, state = '{materia.state}' 
     WHERE id = {id}
     """
 
@@ -111,4 +116,82 @@ def eliminate(id):
         messagebox.showerror(title = tittle, message = message)
 
 
+def show_approved():
+    conection = ConectionDB() 
 
+    list_materias = []
+
+    sentence = """
+    SELECT * FROM materias WHERE qualification >= 6 AND qualification <= 10
+    """
+
+    try:
+        conection.cursor.execute(sentence)
+        list_materias = conection.cursor.fetchall()
+        conection.close()
+    except:
+        tittle = 'Obtener Registros'
+        message = 'No hay tabla para obtener los datos'
+        messagebox.showwarning(title = tittle, message = message)
+        
+    return list_materias 
+
+def show_disapproved():
+    conection = ConectionDB() 
+
+    list_materias = []
+
+    sentence = """
+    SELECT * FROM materias WHERE qualification < 4 AND qualification >= 1 
+    """
+
+    try:
+        conection.cursor.execute(sentence)
+        list_materias = conection.cursor.fetchall()
+        conection.close()
+    except:
+        tittle = 'Obtener Registros'
+        message = 'No hay tabla para obtener los datos'
+        messagebox.showwarning(title = tittle, message = message)
+        
+    return list_materias 
+
+def show_final():
+    conection = ConectionDB() 
+
+    list_materias = []
+
+    sentence = """
+    SELECT * FROM materias WHERE qualification < 6 AND qualification >= 4 
+    """
+
+    try:
+        conection.cursor.execute(sentence)
+        list_materias = conection.cursor.fetchall()
+        conection.close()
+    except:
+        tittle = 'Obtener Registros'
+        message = 'No hay tabla para obtener los datos'
+        messagebox.showwarning(title = tittle, message = message)
+        
+    return list_materias 
+
+def show_unrealized():
+    conection = ConectionDB() 
+
+    list_materias = []
+
+    sentence = """
+    SELECT * FROM materias WHERE qualification == 0
+    """
+
+    try:
+        conection.cursor.execute(sentence)
+        list_materias = conection.cursor.fetchall()
+        conection.close()
+    except:
+        tittle = 'Obtener Registros'
+        message = 'No hay tabla para obtener los datos'
+        messagebox.showwarning(title = tittle, message = message)
+        
+    return list_materias 
