@@ -48,20 +48,24 @@ def eliminate_table():
 def save(materia: Materia):
     conection = ConectionDB()
 
-    sentence = f"""
-    INSERT INTO materias (name, qualification, state) VALUES ('{materia.name}', {materia.qualification}, '{materia.state}')
-    """
+
     try: 
-        conection.cursor.execute(sentence)
-        conection.close()
-    except sqlite3.OperationalError:
+        if float(materia.qualification) >= 0 and float(materia.qualification) <= 10: 
+            sentence = f"""
+            INSERT INTO materias (name, qualification, state) VALUES ('{materia.name}', {materia.qualification}, '{materia.state}')
+            """
+            conection.cursor.execute(sentence)
+            conection.close()
+        else:
+            raise ValueError       
+    except ValueError:
         tittle = 'Guardar datos'
-        message = 'Debe ingresar un numero en Nota Final'
+        message = 'Debe ingresar un numero entre 0 y 10 en Nota Final'
         messagebox.showwarning(title = tittle, message = message)
     except Exception:
         tittle = 'Conexion al Registro'
         message = 'No hay tabla para insertar los datos'
-        messagebox.showerror(title = tittle, message = message)
+        messagebox.showerror(title = tittle, message = message)        
 
 def show():
     conection = ConectionDB() 
@@ -86,6 +90,7 @@ def show():
 def edit(materia: Materia, id):
     conection = ConectionDB()
 
+    
     sentence = f"""
     UPDATE materias
     SET name = '{materia.name}', qualification = {materia.qualification}, state = '{materia.state}' 
@@ -93,9 +98,16 @@ def edit(materia: Materia, id):
     """
 
     try:
-        conection.cursor.execute(sentence)
-        conection.close()
-    except:
+        if float(materia.qualification) >= 0 and float(materia.qualification) <= 10: 
+            conection.cursor.execute(sentence)
+            conection.close()
+        else:
+            raise ValueError
+    except ValueError:
+        tittle = 'Guardar datos'
+        message = 'Debe ingresar un numero entre 0 y 10 en Nota Final'
+        messagebox.showwarning(title = tittle, message = message)
+    except Exception:
         tittle = 'Actualizar Registro'
         message = 'No se ha podido actualizar el registro'
         messagebox.showerror(title = tittle, message = message)

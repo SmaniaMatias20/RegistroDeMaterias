@@ -122,6 +122,9 @@ class Frame(tk.Frame):
     def create_table(self):
         self.table = ttk.Treeview(self, column = ('ID', 'Nombre', 'Nota Final'))
         self.table.grid(row = 7, column = 0, columnspan = 3, sticky = 'nse', padx = 20)
+        self.table.tag_configure('green_color', background = 'lightgreen')
+        self.table.tag_configure('red_color', background = 'salmon')
+        self.table.tag_configure('yellow_color', background = 'light goldenrod')
 
         self.scroll = ttk.Scrollbar(self, orient = 'vertical', command = self.table.yview)
         self.scroll.grid(row = 7, column = 4, sticky = 'nse')
@@ -181,7 +184,9 @@ class Frame(tk.Frame):
         self.create_table()
 
         for m in self.list_materias:
-            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+            tags = self.generate_tag(m[2])
+
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]), tags = tags)
 
 
     def edit_data(self):
@@ -206,7 +211,6 @@ class Frame(tk.Frame):
             self.id = self.table.item(self.table.selection())['text']
             eliminate(self.id)
 
-            # Update table
             self.update()
 
             self.id = None
@@ -225,7 +229,9 @@ class Frame(tk.Frame):
         self.create_table()
 
         for m in self.list_materias:
-            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+            tags = self.generate_tag(m[2])
+
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]), tags = tags)
 
 
     def get_approved(self):
@@ -237,7 +243,8 @@ class Frame(tk.Frame):
         self.create_table()
 
         for m in self.list_materias:
-            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+            tags = self.generate_tag(m[2])
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]), tags = tags)
 
     def get_disapproved(self):
         self.list_materias = show_disapproved()
@@ -248,7 +255,8 @@ class Frame(tk.Frame):
         self.create_table()
 
         for m in self.list_materias:
-            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+            tags = self.generate_tag(m[2])
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]), tags = tags)
     
     def get_unrealized(self):
         self.list_materias = show_unrealized()
@@ -259,7 +267,8 @@ class Frame(tk.Frame):
         self.create_table()
 
         for m in self.list_materias:
-            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+            tags = self.generate_tag(m[2])
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]), tags = tags)
     
     def get_final(self):
         self.list_materias = show_final()
@@ -270,8 +279,20 @@ class Frame(tk.Frame):
         self.create_table()
 
         for m in self.list_materias:
-            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]))
+            tags = ('yellow_color',)
+            self.table.insert('', 0, text = m[0], values = (m[1], m[2], m[3]), tags = tags)
 
+    def generate_tag(self, num):
 
+        if float(num) >= 6 and float(num) <= 10: 
+            tags = ('green_color',)  
+        elif float(num) >= 4 and float(num) <= 5: 
+            tags = ('yellow_color',)
+        elif float(num) >= 1 and float(num) <= 3: 
+            tags = ('red_color',)
+        else: 
+            tags = ()
         
+        return tags
+
 
