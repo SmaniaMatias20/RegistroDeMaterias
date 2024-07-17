@@ -8,6 +8,10 @@
 - **Gestión de Notas:** Posibilidad de registrar, modificar y eliminar calificaciones asociadas a cada materia.
 - **Control Académico:** Facilita el seguimiento del progreso académico del usuario a lo largo de su carrera.
 
+## Imagenes
+
+![](https://github.com/SmaniaMatias20/RegistroDeMaterias/blob/master/img/imagen.png)
+
 ## Requisitos
 - Python 3.x
 - SQLite para la gestión de la base de datos.
