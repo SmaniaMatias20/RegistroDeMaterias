@@ -73,7 +73,7 @@ def show():
     list_materias = []
 
     sentence = """
-    SELECT * FROM materias 
+    SELECT * FROM materias ORDER BY qualification DESC  
     """
 
     try:
@@ -134,7 +134,7 @@ def show_approved():
     list_materias = []
 
     sentence = """
-    SELECT * FROM materias WHERE qualification >= 6 AND qualification <= 10
+    SELECT * FROM materias WHERE qualification >= 6 AND qualification <= 10 ORDER BY qualification DESC 
     """
 
     try:
@@ -154,7 +154,7 @@ def show_disapproved():
     list_materias = []
 
     sentence = """
-    SELECT * FROM materias WHERE qualification < 4 AND qualification >= 1 
+    SELECT * FROM materias WHERE qualification < 4 AND qualification >= 1 ORDER BY qualification DESC  
     """
 
     try:
@@ -174,7 +174,7 @@ def show_final():
     list_materias = []
 
     sentence = """
-    SELECT * FROM materias WHERE qualification < 6 AND qualification >= 4 
+    SELECT * FROM materias WHERE qualification < 6 AND qualification >= 4 ORDER BY qualification DESC 
     """
 
     try:
